@@ -1,0 +1,96 @@
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+
+#define MAX 10
+
+void findFirst(char, int, int);
+
+int count, n = 0;
+char calc_first[MAX][MAX];
+char production[MAX][MAX], first[MAX];
+int m = 0;
+
+int main() {
+    int jm = 0;
+    int i, j;
+    char c, done[MAX];
+    int ptr = -1;
+
+    printf("Enter the number of productions: ");
+    scanf("%d", &count);
+
+    printf("Enter the productions (E.g., E=TX):\n");
+    for (i = 0; i < count; i++) {
+        scanf("%s", production[i]);
+    }
+    for (i = 0; i < count; i++) {
+        for (j = 0; j < MAX; j++) {
+            calc_first[i][j] = '!';
+        }
+    }
+    int point1 = 0, point2, xxx;
+    for (i = 0; i < count; i++) {
+        c = production[i][0];
+        point2 = 0;
+        xxx = 0;
+
+        for (j = 0; j <= ptr; j++)
+            if (c == done[j])
+                xxx = 1;
+
+        if (xxx == 1)
+            continue;
+
+        findFirst(c, 0, 0);
+        ptr += 1;
+        done[ptr] = c;
+        printf("\nFIRST(%c) = { ", c);
+        calc_first[point1][point2++] = c;
+
+        for (j = 0 + jm; j < n; j++) {
+            int lark = 0, chk = 0;
+
+            for (lark = 0; lark < point2; lark++) {
+                if (first[j] == calc_first[point1][lark]) {
+                    chk = 1;
+                    break;
+                }
+            }
+            if (chk == 0) {
+                printf("%c, ", first[j]);
+                calc_first[point1][point2++] = first[j];
+            }
+        }
+        printf("}\n");
+        jm = n;
+        point1++;
+    }
+    printf("\n");
+
+    return 0;
+}
+
+void findFirst(char c, int q1, int q2) {
+    int j;
+
+    if (!(isupper(c))) {
+        first[n++] = c;
+    }
+    for (j = 0; j < count; j++) {
+        if (production[j][0] == c) {
+            if (production[j][2] == '#') {
+                if (production[q1][q2] == '\0')
+                    first[n++] = '#';
+                else if (production[q1][q2] != '\0' && (q1 != 0 || q2 != 0)) {
+                    findFirst(production[q1][q2], q1, (q2 + 1));
+                } else
+                    first[n++] = '#';
+            } else if (!isupper(production[j][2])) {
+                first[n++] = production[j][2];
+            } else {
+                findFirst(production[j][2], j, 3);
+            }
+        }
+    }
+}
